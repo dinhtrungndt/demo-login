@@ -1,20 +1,85 @@
+import * as antd from "antd";
+import * as icons from "@ant-design/icons";
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import {
+  getComments,
+  getDetailPage,
+  postStatus,
+} from "../../../services/home/home";
+import { getAccounts } from "../../../services/user/user";
+import "../css/user.css";
+import { Button, message, Upload, Modal } from "antd";
+import ReactDOM from "react-dom";
+import { toast } from "react-toastify";
 
 export const DetailInfor = () => {
   const [user, setUser] = useState(null);
+  const [detailPage, setDetailPage] = useState(null);
+  const [comments, setComments] = useState([]);
+  const [inputContent, setInputContent] = useState("");
   const [loading, setLoading] = useState(true);
   const idUser = "100015115748911";
   const accessToken =
-    "EAAGNO4a7r2wBO4ww3XJeVooZCOOvu6bZAFJFHUc1AsAtQDTxvIcxWKlB4Lc5txIubeMgluUGpIdvs600dUn6IdZBJIZBZAdtfBpBeLE7ZAehWZCaMiMf0tD2GaBfEGOqZCIMyi1URTAMnziqtj5zQDtHtPG1aamSWwQWu0YqHsoGzaeIZAvnyBYCxGiTZCH3e05fFZCePiPKeNPZAwZDZD";
+    "EAAW75EF8iHQBO3eM23wig6kFwjwtkl3l5Cm8IWPZBQZBThmfuOuZBuokWSHMx8tdL9zKDUCItpULFQjTfbAvZCykQg1SENCIpmm04fRGstseRzGbdQK8Y30jC3ZC7wzZBu177AxZBJBm95CCZC7XzZAJg0Re0wdZAKw4oVk4tnztm6MIq6FmZCApFGygr601RhG6oNGzi80KaJcx9gDUqht";
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+  const handleOk = () => {
+    handlePosts();
+    toast.success("Đăng bài thành công");
+    setInputContent("");
+    setIsModalOpen(false);
+  };
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
+  const handlePosts = async () => {
+    try {
+      const pageId = "317566994771870";
+      const response = await postStatus(pageId, accessToken, inputContent);
+      console.log(">>>>>. response in handlePosts", response);
+      setLoading(false);
+    } catch (error) {
+      console.error("error", error);
+      setLoading(false);
+    }
+  };
 
   const onGetDataDetailUser = async () => {
     try {
-      const response = await axios.get(
-        `https://graph.facebook.com/${idUser}?access_token=${accessToken}`
-      );
-      console.log(">>>>>. response in onGetDataDetailUser", response);
+      const response = await getAccounts(idUser, accessToken);
+      // console.log(">>>>>. response in onGetDataDetailUser", response);
       setUser(response);
+      setLoading(false);
+    } catch (error) {
+      console.error("error onGetDataDetailUser", error);
+      setLoading(false);
+    }
+  };
+
+  const onGetDetailPage = async () => {
+    try {
+      const pageId = "317566994771870";
+      const response = await getDetailPage(pageId, accessToken);
+      // console.log(">>>>>. response in onGetDetailPage", response);
+      setDetailPage(response);
+      setLoading(false);
+    } catch (error) {
+      console.error("error", error);
+      setLoading(false);
+    }
+  };
+
+  const onGetComments = async () => {
+    try {
+      const postId = "317566994771870_122103207110320163";
+      const response = await getComments(postId, accessToken);
+      // console.log(">>>>>. response in onGetComments", response);
+      setComments(response);
       setLoading(false);
     } catch (error) {
       console.error("error", error);
@@ -24,9 +89,11 @@ export const DetailInfor = () => {
 
   useEffect(() => {
     onGetDataDetailUser();
+    onGetDetailPage();
+    onGetComments();
   }, []);
 
-  //   console.log(">>>>>. user", user);
+  // console.log(">>>>>. comments", comments);
 
   if (loading) {
     return <h5> Loading... </h5>;
@@ -36,11 +103,75 @@ export const DetailInfor = () => {
     return <h5> Không tìm thấy user </h5>;
   }
 
+  const { createRoot } = ReactDOM;
+
+  const { UploadOutlined } = icons;
+  const { Button, message, Upload } = antd;
+  const props = {
+    name: "file",
+    action: "https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload",
+    headers: {
+      authorization: "authorization-text",
+    },
+    onChange(info) {
+      if (info.file.status !== "uploading") {
+        console.log(info.file, info.fileList);
+      }
+      if (info.file.status === "done") {
+        message.success(`${info.file.name} file uploaded successfully`);
+      } else if (info.file.status === "error") {
+        message.error(`${info.file.name} file upload failed.`);
+      }
+    },
+  };
+
   return (
-    <div>
-      {/* Hiển thị ra danh sách chi tiết của user đang đăng nhập đựa vào graph API facebook */}
-      {/* https://graph.facebook.com/USER-ID?access_token=ACCESS_TOKEN */}
-      <h5> Chi tiết thông tin của user </h5>
+    <div className="detail-infor">
+      <h5> Hi! {user.name} </h5>
+      <p> ID: {user.id} </p>
+
+      <div className="detail-page">
+        <h5> List Page </h5>
+        {/* <p> ID: {detailPage.id} </p> */}
+        <p> Name: {detailPage.name} </p>
+      </div>
+
+      <div className="comments">
+        <h5> List Comments </h5>
+        {comments.map((comment, index) => (
+          <div key={index} className="comment">
+            {/* <p> ID: {comment.id} </p> */}
+            <p className="name"> Name: {comment.from.name} </p>
+            <p> Message: {comment.message} </p>
+          </div>
+        ))}
+      </div>
+
+      <div className="buttons">
+        <Button type="primary" onClick={showModal} className="btn-add">
+          Thêm
+        </Button>
+        <button className="btn-update">Cập nhập</button>
+        <button className="btn-delete">Xóa</button>
+      </div>
+
+      <Modal
+        title={detailPage.name}
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+      >
+        <p className="text-content">Nhập nội dung đăng(Bắt buộc): </p>
+        <input
+          className="input-content"
+          type="text"
+          onChange={(e) => setInputContent(e.target.value)}
+        ></input>
+        <p className="text-content">File đính kèm(Không bắt buộc): </p>
+        <Upload {...props}>
+          <Button icon={<UploadOutlined />}>Click to Upload</Button>
+        </Upload>
+      </Modal>
     </div>
   );
 };

@@ -1,0 +1,68 @@
+.detail-infor {
+  font-family: Arial, sans-serif;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.detail-page,
+.comments {
+  border: 1px solid #000;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+.buttons {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  align-items: center;
+  justify-content: center;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 5px;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-add {
+  background-color: #4caf50;
+  color: white;
+}
+
+.btn-update {
+  background-color: #2196f3;
+  color: white;
+}
+
+.btn-delete {
+  background-color: #f44336;
+  color: white;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+.name {
+  color: #2196f3;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.text-content {
+  font-size: 16px;
+}
+
+.input-content {
+  width: 80%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #000;
+}
