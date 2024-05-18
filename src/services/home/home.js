@@ -14,6 +14,20 @@ export const getDetailPage = async (pageId, accessToken) => {
   }
 };
 
+// Lấy tất cả bài viết trong page
+export const getPostsInPage = async (pageId, accessToken) => {
+  try {
+    const response = await AxiosInstance().get(
+      `/posts/get-posts-all/${pageId}/${accessToken}`
+    );
+    // console.log("get post >>>>>>>>>>>>>>> Service GetPosts 8 ", response);
+    return response.data;
+  } catch (error) {
+    console.error(" >>>>>>>>> Error fetching posts: 11 s", error);
+    throw error;
+  }
+};
+
 // Lấy danh sách comment của bài viết
 export const getComments = async (postId, accessToken) => {
   try {
