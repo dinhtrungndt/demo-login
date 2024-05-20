@@ -304,7 +304,7 @@ export const PageMain = (data) => {
       </Modal>
       <Modal
         title="Đăng bài viết"
-        visible={addPostModal}
+        open={addPostModal}
         onOk={handleAddModal}
         onCancel={handleCloseAddPost}
         centered
@@ -360,7 +360,7 @@ export const PageMain = (data) => {
       </Modal>
       <Modal
         title="Sửa bài viết"
-        visible={putPostModal}
+        open={putPostModal}
         onOk={handlePutModal}
         onCancel={handleClosePutPost}
         centered
@@ -424,7 +424,7 @@ export const PageMain = (data) => {
       </Modal>
       <Modal
         title="Xác nhận"
-        visible={yesNo}
+        open={yesNo}
         onOk={handleYes}
         onCancel={handleNo}
         centered

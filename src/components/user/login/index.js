@@ -1,15 +1,82 @@
-import { Button } from "antd";
-import React, { useState } from "react";
+import { Button, Tabs } from "antd";
+import React, { useState, useRef } from "react";
 import FacebookLogin from "react-facebook-login";
 import { Card, Image } from "react-bootstrap";
 import "../style/login.css";
 import { PageMain } from "../../home/pages";
 import { toast } from "react-toastify";
+import { DetailInfor } from "../../home/user";
 
 export const LoginPage = () => {
   const [login, setLogin] = useState(false);
   const [data, setData] = useState({});
   const [picture, setPicture] = useState("");
+
+  localStorage.setItem("id_user", JSON.stringify(data.id));
+  localStorage.setItem("token", JSON.stringify(data.accessToken));
+
+  const initialItems = [
+    {
+      label: "Quản lý Page",
+      children: <PageMain />,
+      key: "1",
+    },
+    {
+      label: "Trang cá nhân",
+      children: "Content of Tab 2",
+      key: "2",
+    },
+    {
+      label: "Thông tin cá nhân",
+      children: <DetailInfor />,
+      key: "3",
+      closable: false,
+    },
+  ];
+
+  const [activeKey, setActiveKey] = useState(initialItems[0].key);
+  const [items, setItems] = useState(initialItems);
+  const newTabIndex = useRef(0);
+  const onChange = (newActiveKey) => {
+    setActiveKey(newActiveKey);
+  };
+  const add = () => {
+    const newActiveKey = `newTab${newTabIndex.current++}`;
+    const newPanes = [...items];
+    newPanes.push({
+      label: "New Tab",
+      children: "Content of new Tab",
+      key: newActiveKey,
+    });
+    setItems(newPanes);
+    setActiveKey(newActiveKey);
+  };
+  const remove = (targetKey) => {
+    let newActiveKey = activeKey;
+    let lastIndex = -1;
+    items.forEach((item, i) => {
+      if (item.key === targetKey) {
+        lastIndex = i - 1;
+      }
+    });
+    const newPanes = items.filter((item) => item.key !== targetKey);
+    if (newPanes.length && newActiveKey === targetKey) {
+      if (lastIndex >= 0) {
+        newActiveKey = newPanes[lastIndex].key;
+      } else {
+        newActiveKey = newPanes[0].key;
+      }
+    }
+    setItems(newPanes);
+    setActiveKey(newActiveKey);
+  };
+  const onEdit = (targetKey, action) => {
+    if (action === "add") {
+      add();
+    } else {
+      remove(targetKey);
+    }
+  };
 
   const responseFacebook = (response) => {
     // console.log(response);
@@ -45,16 +112,24 @@ export const LoginPage = () => {
               </div>
             </div>
           )}
-          {login && (
+          {/* {login && (
             <Image className="avatarUser" src={picture} roundedCircle />
-          )}
+          )} */}
         </Card.Header>
         {login && (
           <Card.Body>
             {/* {console.log(data)} */}
-            <Card.Title className="nameUser">{data.name}</Card.Title>
-            <Card.Text className="emailUser">{data.email}</Card.Text>
-            <PageMain {...data} />
+            <Card.Title className="nameUser">
+              Trang quản trị Facebook
+            </Card.Title>
+            {/* <Card.Text className="emailUser">{data.email}</Card.Text> */}
+            <Tabs
+              type="editable-card"
+              onChange={onChange}
+              activeKey={activeKey}
+              onEdit={onEdit}
+              items={items}
+            />
           </Card.Body>
         )}
       </Card>
