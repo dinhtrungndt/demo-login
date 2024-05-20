@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   addPost,
   deletePost,
+  editPost,
   getDetailPage,
   getPostsInPage,
   postStatus,
@@ -19,12 +20,13 @@ export const PageMain = (data) => {
   const [page, setPage] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [post, setPost] = useState(null);
+  const [message, setMessage] = useState("");
   const [yesNo, setYesNo] = useState(false);
   const [addPostModal, setAddPostModal] = useState(false);
+  const [putPostModal, setPutPostModal] = useState(false);
   const [imageUrls, setImageUrls] = useState([]);
   const [imageFiles, setImageFiles] = useState([]);
   const [images, setImages] = useState([]);
-  const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   // console.log("imagesimages", images);
@@ -49,6 +51,11 @@ export const PageMain = (data) => {
 
   const handleAddModal = async () => {
     try {
+      if (!message.trim()) {
+        toast.error("Nội dung không được để trống");
+        return;
+      }
+
       const res = await postStatus(page[0]?.id, accessToken, message, images);
       console.log("res", res);
       setAddPostModal(false);
@@ -63,7 +70,27 @@ export const PageMain = (data) => {
     }
   };
 
-  const handleCloneAddPost = () => {
+  const handlePutModal = async () => {
+    try {
+      const res = await editPost(post.id, accessToken, message);
+      console.log("res", res);
+      setPutPostModal(false);
+      setIsModalOpen(false);
+      setImageUrls([]);
+      setImageFiles([]);
+      setMessage("");
+      toast.success("Sửa bài thành công");
+      onGetReloadAll();
+    } catch (error) {
+      console.error("error", error);
+    }
+  };
+
+  const handleClosePutPost = () => {
+    setPutPostModal(false);
+  };
+
+  const handleCloseAddPost = () => {
     setAddPostModal(false);
   };
 
@@ -173,6 +200,10 @@ export const PageMain = (data) => {
     setAddPostModal(true);
   };
 
+  const handlePutPost = () => {
+    setPutPostModal(true);
+  };
+
   const handleDeletePost = () => {
     setYesNo(true);
   };
@@ -191,7 +222,7 @@ export const PageMain = (data) => {
     </div>
   ) : (
     <div className="w-full h-full p-2">
-      <div className="flex row justify-center items-center mb-3">
+      <div className="flex row items-center mb-3">
         <h5>Trang của bạn: </h5>
         <img
           src={page[0].picture.data.url}
@@ -255,7 +286,11 @@ export const PageMain = (data) => {
           >
             Thêm
           </Button>
-          <Button className="bg-yellow-500" type="primary">
+          <Button
+            className="bg-yellow-500"
+            type="primary"
+            onClick={handlePutPost}
+          >
             Sửa
           </Button>
           <Button
@@ -271,10 +306,10 @@ export const PageMain = (data) => {
         title="Đăng bài viết"
         visible={addPostModal}
         onOk={handleAddModal}
-        onCancel={handleCloneAddPost}
+        onCancel={handleCloseAddPost}
         centered
         footer={[
-          <Button key="back" onClick={handleCloneAddPost}>
+          <Button key="back" onClick={handleCloseAddPost}>
             Hủy
           </Button>,
           <Button key="submit" type="primary" onClick={handleAddModal}>
@@ -323,7 +358,70 @@ export const PageMain = (data) => {
           </div>
         </div>
       </Modal>
-
+      <Modal
+        title="Sửa bài viết"
+        visible={putPostModal}
+        onOk={handlePutModal}
+        onCancel={handleClosePutPost}
+        centered
+        footer={[
+          <Button key="back" onClick={handleClosePutPost}>
+            Hủy
+          </Button>,
+          <Button key="submit" type="primary" onClick={handlePutModal}>
+            Sửa bài
+          </Button>,
+        ]}
+      >
+        <div className="flex flex-col">
+          <input
+            type="text"
+            placeholder="Nhập nội dung"
+            defaultValue={post?.message === undefined ? "" : post?.message}
+            onChange={(e) => setMessage(e.target.value)}
+            className="p-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500"
+          />
+          <div className="flex justify-between mt-3">
+            <input
+              type="text"
+              placeholder="Dán link"
+              onBlur={handleLinkChange}
+              className="w-1/2 p-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500"
+            />
+            <input
+              type="file"
+              multiple
+              className="w-1/2 p-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500"
+              onChange={handleFileChange}
+            />
+          </div>
+          <div className="flex flex-wrap mt-3">
+            {imageUrls.map((url, index) => (
+              <img
+                key={index}
+                src={url}
+                alt="Link Image"
+                className="w-1/4 p-2"
+              />
+            ))}
+            {imageFiles.map((file, index) => (
+              <img
+                key={index}
+                src={file}
+                alt="File Image"
+                className="w-1/4 p-2"
+              />
+            ))}
+            {post?.full_picture && (
+              <img
+                src={post?.full_picture}
+                alt="full_picture"
+                className="w-1/6 p-2"
+              />
+            )}
+          </div>
+        </div>
+      </Modal>
       <Modal
         title="Xác nhận"
         visible={yesNo}

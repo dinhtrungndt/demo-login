@@ -6,7 +6,7 @@ export const getDetailPage = async (pageId, accessToken) => {
     const response = await AxiosInstance().get(
       `/posts/get-posts/${pageId}/${accessToken}`
     );
-    console.log("get post >>>>>>>>>>>>>>> Service GetPosts 8 ", response);
+    // console.log("get post >>>>>>>>>>>>>>> Service GetPosts 8 ", response);
     return response;
   } catch (error) {
     console.error(" >>>>>>>>> Error fetching posts: 11 s", error);
@@ -47,6 +47,21 @@ export const postStatus = async (pageId, accessToken, message) => {
   try {
     const response = await AxiosInstance().post(
       `/posts/post-posts/${pageId}/${accessToken}`,
+      { message }
+    );
+    // console.log("get post >>>>>>>>>>>>>>> Service GetPosts 8 ", response);
+    return response;
+  } catch (error) {
+    console.error(" >>>>>>>>> Error fetching posts: 11 s", error);
+    throw error;
+  }
+};
+
+// Sửa bài viết
+export const editPost = async (postId, accessToken, message) => {
+  try {
+    const response = await AxiosInstance().put(
+      `/posts/update-posts/${postId}/${accessToken}`,
       { message }
     );
     // console.log("get post >>>>>>>>>>>>>>> Service GetPosts 8 ", response);
