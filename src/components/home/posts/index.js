@@ -51,6 +51,7 @@ export const PostsPages = () => {
   const handleOk = () => {
     setIsModalOpen(false);
   };
+
   const handleCancel = () => {
     setIsModalOpen(false);
   };
@@ -133,6 +134,37 @@ export const PostsPages = () => {
     console.log("comment reply parentC", item);
   };
 
+  const highlightMessageTags = (message, tags) => {
+    if (!tags || tags.length === 0) {
+      return message;
+    }
+
+    let parts = [];
+    let lastIndex = 0;
+
+    tags.forEach((tag) => {
+      const { offset, length, name } = tag;
+      if (offset > lastIndex) {
+        parts.push(message.substring(lastIndex, offset));
+      }
+      parts.push(
+        <span
+          className="font-bold text-blue-600 cursor-pointer hover:text-blue-900"
+          key={offset}
+        >
+          {message.substring(offset, offset + length)}
+        </span>
+      );
+      lastIndex = offset + length;
+    });
+
+    if (lastIndex < message.length) {
+      parts.push(message.substring(lastIndex));
+    }
+
+    return parts;
+  };
+
   useEffect(() => {
     onGetAllComments();
   }, []);
@@ -159,7 +191,7 @@ export const PostsPages = () => {
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <p className="ml-2 font-semibold text-gray-800">
+                <p className="font-semibold text-gray-800">
                   {comment.from.name}
                 </p>
               </div>
@@ -170,7 +202,10 @@ export const PostsPages = () => {
                 />
               </p>
             </div>
-            <p className="text-gray-800">{comment.message}</p>
+            <p className="text-gray-800">
+              {" "}
+              {highlightMessageTags(comment.message, comment.message_tags)}
+            </p>
             <div className="flex items-center">
               <p
                 className="text-blue-500 cursor-pointer hover:text-blue-900"
@@ -183,21 +218,35 @@ export const PostsPages = () => {
               </p>
             </div>
             <div className="ml-8">
-              {/* {console.log(
-                "comment.reply",
-                comment.reply.map((reply) => reply.parent.id)
-              )} */}
-              {/* {console.log(
-                "reply.id",
-                comment.reply.map((reply) => reply?.message_tags?.length > 0)
-              )} */}
+              {console.log(
+                "comment message",
+                comment.reply.map((reply) => reply?.message)
+              )}
+              {console.log(
+                "comment.reply message_tags",
+                comment.reply.map((reply) => reply.message_tags)
+              )}
               {comment.reply.map((reply) => (
                 <div key={reply.id} className=" items-center p-2">
-                  <div className="flex items-center">
-                    <p className="ml-2 font-semibold text-gray-800">
-                      {reply.from.name}
+                  <div className="flex items-center justify-between pr-2">
+                    <div className="flex items-center">
+                      <p className="font-semibold text-gray-800">
+                        {reply.from.name}
+                      </p>
+                      <p className="ml-2 text-gray-800">
+                        {" "}
+                        {highlightMessageTags(
+                          reply.message,
+                          reply.message_tags
+                        )}
+                      </p>
+                    </div>
+                    <p className="text-xs text-gray-500 flex items-center">
+                      <IoIosMore
+                        className="text-gray-500 cursor-pointer text-3xl pl-2 hover:text-gray-800"
+                        onClick={() => showModal(comment)}
+                      />
                     </p>
-                    <p className="ml-2 text-gray-800">{reply.message}</p>
                   </div>
                   <div className="flex items-center">
                     <p
