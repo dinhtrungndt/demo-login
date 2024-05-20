@@ -235,7 +235,7 @@ export const PageMain = (data) => {
         <div
           key={index}
           onClick={() => showModal(item)}
-          className="border-b-2 border-gray-200 p-2 flex items-center flex-col sm:flex-row justify-between cursor-pointer hover:bg-slate-200"
+          className="border-b-2 border-gray-200 flex items-center flex-col sm:flex-row justify-between cursor-pointer hover:bg-slate-200"
         >
           <div>
             <div className="text-lg p-3 pb-0 ">

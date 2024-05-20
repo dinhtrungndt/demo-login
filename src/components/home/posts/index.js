@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import {
+  deleteComment,
   getComments,
   getCommentsReply,
   postComment,
@@ -15,6 +16,7 @@ export const PostsPages = () => {
   const post = location.state.post;
   const [comments, setComments] = useState([]);
   const [message, setMessage] = useState("");
+  const [detailComment, setDetailComment] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [yesNo, setYesNo] = useState(false);
@@ -24,12 +26,25 @@ export const PostsPages = () => {
   // console.log("comments in PostsPages", comments);
 
   const handleYes = async () => {
-    console.log("yes");
+    try {
+      const response = await deleteComment(detailComment.id, accessToken);
+      // console.log("response", response);
+      onReloadComment();
+      setIsModalOpen(false);
+      setYesNo(false);
+      toast.success("Xóa bình luận thành công");
+    } catch (error) {
+      console.error("error", error);
+    }
+  };
+
+  const handleNo = () => {
+    setYesNo(false);
   };
 
   const showModal = (item) => {
-    console.log("item", item);
-    setComments(item);
+    // console.log("item", item);
+    setDetailComment(item);
     setIsModalOpen(true);
   };
 
@@ -97,6 +112,7 @@ export const PostsPages = () => {
     try {
       const response = await postComment(post.id, accessToken, message);
       // console.log("response", response);
+      setMessage("");
       onReloadComment();
       toast.success("Bình luận thành công");
     } catch (error) {
@@ -105,7 +121,16 @@ export const PostsPages = () => {
   };
 
   const handleDeletePost = async () => {
-    console.log("delete post");
+    setYesNo(true);
+    toast.error("Cảnh báo: Bạn đang muốn xóa bài viết này!");
+  };
+
+  const handleCommentReplyParent = (item) => {
+    console.log("comment reply parent", item);
+  };
+
+  const handleCommentReplyParentC = (item) => {
+    console.log("comment reply parentC", item);
   };
 
   useEffect(() => {
@@ -126,9 +151,12 @@ export const PostsPages = () => {
         src={post.full_picture}
         alt=""
       />
-      <div className="w-full p-4">
+      <div className="w-1/2 p-2">
         {comments?.map((comment) => (
-          <div key={comment.id} className="flex flex-col p-2">
+          <div
+            key={comment.id}
+            className="flex flex-col p-2 pl-5 pr-5 rounded-lg bg-white shadow-lg hover:shadow-xl my-2"
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <p className="ml-2 font-semibold text-gray-800">
@@ -136,14 +164,24 @@ export const PostsPages = () => {
                 </p>
               </div>
               <p className="text-xs text-gray-500 flex items-center">
-                {formatTime(comment.created_time)}
                 <IoIosMore
-                  className="text-gray-500 cursor-pointer text-xl pl-2"
+                  className="text-gray-500 cursor-pointer text-3xl pl-2 hover:text-gray-800"
                   onClick={() => showModal(comment)}
                 />
               </p>
             </div>
             <p className="text-gray-800">{comment.message}</p>
+            <div className="flex items-center">
+              <p
+                className="text-blue-500 cursor-pointer hover:text-blue-900"
+                onClick={() => handleCommentReplyParent(comment)}
+              >
+                Trả lời
+              </p>
+              <p className="text-gray-500 text-xs ml-2">
+                {formatTime(comment.created_time)}
+              </p>
+            </div>
             <div className="ml-8">
               {/* {console.log(
                 "comment.reply",
@@ -154,12 +192,24 @@ export const PostsPages = () => {
                 comment.reply.map((reply) => reply?.message_tags?.length > 0)
               )} */}
               {comment.reply.map((reply) => (
-                <div key={reply.id} className="flex items-center p-2">
-                  <p className="ml-2 font-semibold text-gray-800">
-                    {reply.from.name}
-                  </p>
-                  <p className="ml-2 text-gray-800">{reply.message}</p>
-                  {/* xếp theo id comment reply */}
+                <div key={reply.id} className=" items-center p-2">
+                  <div className="flex items-center">
+                    <p className="ml-2 font-semibold text-gray-800">
+                      {reply.from.name}
+                    </p>
+                    <p className="ml-2 text-gray-800">{reply.message}</p>
+                  </div>
+                  <div className="flex items-center">
+                    <p
+                      className="text-blue-500 cursor-pointer hover:text-blue-900"
+                      onClick={() => handleCommentReplyParentC(reply)}
+                    >
+                      Trả lời
+                    </p>
+                    <p className="text-gray-500 text-xs ml-2">
+                      {formatTime(reply.created_time)}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -167,12 +217,17 @@ export const PostsPages = () => {
         ))}
       </div>
       {/* Bình luận */}
-      <div className="w-full p-4 flex items-center">
+      <div className="w-1/2 p-4 flex items-center">
         <input
           type="text"
-          className="w-full p-2 border border-gray-300 rounded-lg"
+          className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none"
           placeholder="Nhập bình luận"
           onChange={(e) => setMessage(e.target.value)}
+          onKeyPress={(e) => {
+            if (e.key === "Enter") {
+              handlePostComment();
+            }
+          }}
         />
         <button
           className="p-2 bg-blue-500 text-white rounded-lg ml-2 hover:bg-blue-600"
@@ -190,10 +245,7 @@ export const PostsPages = () => {
         centered
         footer={[<div key="back"></div>]}
       >
-        <div className="flex justify-between">
-          <Button className="bg-blue-500" type="primary">
-            Thêm
-          </Button>
+        <div className="flex items-center justify-between">
           <Button className="bg-yellow-500" type="primary">
             Sửa
           </Button>
@@ -205,6 +257,23 @@ export const PostsPages = () => {
             Xóa
           </Button>
         </div>
+      </Modal>
+      <Modal
+        title="Xác nhận"
+        open={yesNo}
+        onOk={handleYes}
+        onCancel={handleNo}
+        centered
+        footer={[
+          <Button key="back" onClick={handleNo}>
+            No
+          </Button>,
+          <Button key="submit" type="primary" onClick={handleYes}>
+            Yes
+          </Button>,
+        ]}
+      >
+        <p>Bạn có chắc chắn muốn xóa bài viết này không?</p>
       </Modal>
     </div>
   );

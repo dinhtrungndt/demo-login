@@ -114,3 +114,17 @@ export const postComment = async (postId, accessToken, message) => {
     throw error;
   }
 };
+
+// Xóa comment
+export const deleteComment = async (commentId, accessToken) => {
+  try {
+    const response = await AxiosInstance().delete(
+      `/comments/delete-comments/${commentId}/${accessToken}`
+    );
+    // console.log("get post >>>>>>>>>>>>>>> Service GetPosts 8 ", response);
+    return response;
+  } catch (error) {
+    console.error(" >>>>>>>>> Error fetching posts: 11 s", error);
+    throw error;
+  }
+};
