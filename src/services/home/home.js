@@ -99,3 +99,18 @@ export const getCommentsReply = async (commentId, accessToken) => {
     throw error;
   }
 };
+
+// Thêm comment
+export const postComment = async (postId, accessToken, message) => {
+  try {
+    const response = await AxiosInstance().post(
+      `/comments/comment-posts/${postId}/${accessToken}`,
+      { message }
+    );
+    // console.log("get post >>>>>>>>>>>>>>> Service GetPosts 8 ", response);
+    return response;
+  } catch (error) {
+    console.error(" >>>>>>>>> Error fetching posts: 11 s", error);
+    throw error;
+  }
+};
