@@ -8,17 +8,7 @@ import { PostsPages } from "./components/home/posts";
 
 function App() {
   return (
-    <div
-      className="w-full
-    h-full
-    font-sans
-    text-sm
-    text-gray-700
-    antialiased
-    overflow-x-hidden
-    overflow-y-auto
-    "
-    >
+    <div className="w-full h-full font-sans text-sm text-gray-700 antialiased overflow-x-hidden overflow-y-auto">
       <Router>
         <Routes>
           <Route path="/" element={<LoginPage />} />
