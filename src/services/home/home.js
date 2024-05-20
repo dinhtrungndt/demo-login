@@ -28,20 +28,6 @@ export const getPostsInPage = async (pageId, accessToken) => {
   }
 };
 
-// Lấy danh sách comment của bài viết
-export const getComments = async (postId, accessToken) => {
-  try {
-    const response = await AxiosInstance().get(
-      `/comments/get-comments-facebook/${postId}/${accessToken}`
-    );
-    // console.log("get post >>>>>>>>>>>>>>> Service GetPosts 8 ", response);
-    return response.data;
-  } catch (error) {
-    console.error(" >>>>>>>>> Error fetching posts: 11 s", error);
-    throw error;
-  }
-};
-
 // Đăng bài viết
 export const postStatus = async (pageId, accessToken, message) => {
   try {
@@ -80,6 +66,34 @@ export const deletePost = async (postId, accessToken) => {
     );
     // console.log("get post >>>>>>>>>>>>>>> Service GetPosts 8 ", response);
     return response;
+  } catch (error) {
+    console.error(" >>>>>>>>> Error fetching posts: 11 s", error);
+    throw error;
+  }
+};
+
+// Lấy danh sách comment của bài viết
+export const getComments = async (postId, accessToken) => {
+  try {
+    const response = await AxiosInstance().get(
+      `/comments/get-comments-facebook/${postId}/${accessToken}`
+    );
+    // console.log("get post >>>>>>>>>>>>>>> Service GetPosts 8 ", response);
+    return response.data;
+  } catch (error) {
+    console.error(" >>>>>>>>> Error fetching posts: 11 s", error);
+    throw error;
+  }
+};
+
+// Lấy danh sách comment reply của bài viết
+export const getCommentsReply = async (commentId, accessToken) => {
+  try {
+    const response = await AxiosInstance().get(
+      `/comments/get-reply-comments/${commentId}/${accessToken}`
+    );
+    // console.log("get post >>>>>>>>>>>>>>> Service GetPosts 8 ", response);
+    return response.data;
   } catch (error) {
     console.error(" >>>>>>>>> Error fetching posts: 11 s", error);
     throw error;
