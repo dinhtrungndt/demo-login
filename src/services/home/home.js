@@ -115,6 +115,36 @@ export const postComment = async (postId, accessToken, message) => {
   }
 };
 
+// cập nhật comment
+export const editComment = async (commentId, accessToken, message) => {
+  try {
+    const response = await AxiosInstance().put(
+      `/comments/update-reply-comments/${commentId}/${accessToken}`,
+      { message }
+    );
+    // console.log("get post >>>>>>>>>>>>>>> Service GetPosts 8 ", response);
+    return response;
+  } catch (error) {
+    console.error(" >>>>>>>>> Error fetching posts: 11 s", error);
+    throw error;
+  }
+};
+
+// Phản hồi bình luận comment
+export const replyComment = async (commentId, accessToken, message) => {
+  try {
+    const response = await AxiosInstance().post(
+      `/comments/reply-comments/${commentId}/${accessToken}`,
+      { message }
+    );
+    // console.log("get post >>>>>>>>>>>>>>> Service GetPosts 8 ", response);
+    return response;
+  } catch (error) {
+    console.error(" >>>>>>>>> Error fetching posts: 11 s", error);
+    throw error;
+  }
+};
+
 // Xóa comment
 export const deleteComment = async (commentId, accessToken) => {
   try {

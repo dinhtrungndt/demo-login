@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import {
   deleteComment,
+  editComment,
   getComments,
   getCommentsReply,
   postComment,
+  replyComment,
 } from "../../../services/home/home";
 import moment from "moment";
 import { toast } from "react-toastify";
@@ -19,11 +21,38 @@ export const PostsPages = () => {
   const [detailComment, setDetailComment] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [putPostModal, setPutPostModal] = useState(false);
   const [yesNo, setYesNo] = useState(false);
   const accessToken =
     "EAAW75EF8iHQBO3eM23wig6kFwjwtkl3l5Cm8IWPZBQZBThmfuOuZBuokWSHMx8tdL9zKDUCItpULFQjTfbAvZCykQg1SENCIpmm04fRGstseRzGbdQK8Y30jC3ZC7wzZBu177AxZBJBm95CCZC7XzZAJg0Re0wdZAKw4oVk4tnztm6MIq6FmZCApFGygr601RhG6oNGzi80KaJcx9gDUqht";
 
   // console.log("comments in PostsPages", comments);
+
+  const handlePutModal = async () => {
+    try {
+      const response = await editComment(
+        detailComment.id,
+        accessToken,
+        message
+      );
+      console.log("response", response);
+      setMessage("");
+      setPutPostModal(false);
+      setIsModalOpen(false);
+      onReloadComment();
+      toast.success("Sửa bình luận thành công");
+    } catch (error) {
+      console.error("error", error);
+    }
+  };
+
+  const handleClosePutPost = () => {
+    setPutPostModal(false);
+  };
+
+  const handlePutPost = () => {
+    setPutPostModal(true);
+  };
 
   const handleYes = async () => {
     try {
@@ -127,7 +156,12 @@ export const PostsPages = () => {
   };
 
   const handleCommentReplyParent = (item) => {
-    console.log("comment reply parent", item);
+    if (message.indexOf(`@${item.from.name}`) !== -1) {
+      return;
+    }
+
+    const name = `@${item.from.name} `;
+    setMessage((prevMessage) => prevMessage + name);
   };
 
   const handleCommentReplyParentC = (item) => {
@@ -218,14 +252,14 @@ export const PostsPages = () => {
               </p>
             </div>
             <div className="ml-8">
-              {console.log(
+              {/* {console.log(
                 "comment message",
                 comment.reply.map((reply) => reply?.message)
               )}
               {console.log(
                 "comment.reply message_tags",
                 comment.reply.map((reply) => reply.message_tags)
-              )}
+              )} */}
               {comment.reply.map((reply) => (
                 <div key={reply.id} className=" items-center p-2">
                   <div className="flex items-center justify-between pr-2">
@@ -271,6 +305,7 @@ export const PostsPages = () => {
           type="text"
           className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none"
           placeholder="Nhập bình luận"
+          defaultValue={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyPress={(e) => {
             if (e.key === "Enter") {
@@ -295,7 +330,11 @@ export const PostsPages = () => {
         footer={[<div key="back"></div>]}
       >
         <div className="flex items-center justify-between">
-          <Button className="bg-yellow-500" type="primary">
+          <Button
+            className="bg-yellow-500"
+            type="primary"
+            onClick={handlePutPost}
+          >
             Sửa
           </Button>
           <Button
@@ -305,6 +344,40 @@ export const PostsPages = () => {
           >
             Xóa
           </Button>
+        </div>
+      </Modal>
+      <Modal
+        title="Sửa nội dung bình luận"
+        open={putPostModal}
+        onOk={handlePutModal}
+        onCancel={handleClosePutPost}
+        centered
+        footer={[
+          <Button key="back" onClick={handleClosePutPost}>
+            Hủy
+          </Button>,
+          <Button key="submit" type="primary" onClick={handlePutModal}>
+            Sửa
+          </Button>,
+        ]}
+      >
+        <div className="flex flex-col">
+          <input
+            type="text"
+            placeholder="Nhập nội dung"
+            defaultValue={detailComment.message}
+            onChange={(e) => setMessage(e.target.value)}
+            className="p-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500"
+          />
+          <div className="flex flex-wrap items-center justify-center mt-3">
+            {post?.full_picture && (
+              <img
+                src={post?.full_picture}
+                alt="full_picture"
+                className="w-1/6 p-2"
+              />
+            )}
+          </div>
         </div>
       </Modal>
       <Modal

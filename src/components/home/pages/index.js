@@ -30,7 +30,7 @@ export const PageMain = (data) => {
   // const [images, setImages] = useState("");
   const navigate = useNavigate();
 
-  console.log("postpost", post);
+  // console.log("postpost", post);
 
   // const handleEndImage = () => {
   //   setImages([...imageUrls, ...imageFiles]);
