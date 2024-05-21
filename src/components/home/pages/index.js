@@ -6,6 +6,7 @@ import {
   getDetailPage,
   getPostsInPage,
   postStatus,
+  uploadImageStatus,
 } from "../../../services/home/home";
 import moment from "moment";
 import { Button, Modal } from "antd";
@@ -24,45 +25,47 @@ export const PageMain = (data) => {
   const [yesNo, setYesNo] = useState(false);
   const [addPostModal, setAddPostModal] = useState(false);
   const [putPostModal, setPutPostModal] = useState(false);
-  const [imageUrls, setImageUrls] = useState([]);
-  const [imageFiles, setImageFiles] = useState([]);
-  const [images, setImages] = useState([]);
+  const [imageUrls, setImageUrls] = useState("");
+  const [imageFiles, setImageFiles] = useState(null);
+  // const [images, setImages] = useState("");
   const navigate = useNavigate();
 
-  // console.log("imagesimages", images);
+  console.log("postpost", post);
 
-  const handleEndImage = () => {
-    setImages([...imageUrls, ...imageFiles]);
-  };
+  // const handleEndImage = () => {
+  //   setImages([...imageUrls, ...imageFiles]);
+  // };
 
   const handleLinkChange = (e) => {
-    const url = e.target.value;
-    if (url) {
-      setImageUrls([...imageUrls, url]);
-      e.target.value = "";
-    }
+    setImageUrls(e.target.value);
   };
 
-  const handleFileChange = (e) => {
-    const files = Array.from(e.target.files);
-    const fileUrls = files.map((file) => URL.createObjectURL(file));
-    setImageFiles([...imageFiles, ...fileUrls]);
+  const handleFileChange = async (e) => {
+    try {
+      const file = e.target.files[0];
+      const formData = new FormData();
+      formData.append("cloudinary", file);
+      const res = await uploadImageStatus(formData);
+      setImageFiles(res);
+    } catch (error) {
+      console.error("error", error);
+    }
   };
 
   const handleAddModal = async () => {
     try {
-      if (!message.trim()) {
-        toast.error("Nội dung không được để trống");
+      if (message === "" && imageUrls === "" && imageFiles === null) {
+        toast.error("Bạn vui lòng nhập message hoặc link");
         return;
       }
 
-      const res = await postStatus(page[0]?.id, accessToken, message, images);
-      console.log("res", res);
+      const link = imageUrls !== "" ? imageUrls : imageFiles;
+      const res = await postStatus(page[0]?.id, accessToken, message, link);
+      setMessage("");
+      setImageUrls("");
+      setImageFiles(null);
       setAddPostModal(false);
       setIsModalOpen(false);
-      setImageUrls([]);
-      setImageFiles([]);
-      setMessage("");
       toast.success("Đăng bài thành công");
       onGetReloadAll();
     } catch (error) {
@@ -73,11 +76,10 @@ export const PageMain = (data) => {
   const handlePutModal = async () => {
     try {
       const res = await editPost(post.id, accessToken, message);
-      console.log("res", res);
       setPutPostModal(false);
       setIsModalOpen(false);
-      setImageUrls([]);
-      setImageFiles([]);
+      setImageUrls("");
+      setImageFiles(null);
       setMessage("");
       toast.success("Sửa bài thành công");
       onGetReloadAll();
@@ -206,15 +208,16 @@ export const PageMain = (data) => {
 
   const handleDeletePost = () => {
     setYesNo(true);
+    toast.error("Cảnh báo: Bạn đang muốn xóa bài viết này!");
   };
 
   useEffect(() => {
     onGetDetailAndPage();
   }, []);
 
-  useEffect(() => {
-    handleEndImage();
-  }, [imageUrls, imageFiles]);
+  // useEffect(() => {
+  //   handleEndImage();
+  // }, [imageUrls, imageFiles]);
 
   return loading ? (
     <div className="w-full h-full p-2 justify-center items-center flex flex-col text-lg text-blue-500">
@@ -239,11 +242,7 @@ export const PageMain = (data) => {
         >
           <div>
             <div className="text-lg p-3 pb-0 ">
-              {item.message
-                ? item.message
-                : item.story
-                ? item.story
-                : "No message"}
+              {item.message ? item.message : item.story ? item.story : ""}
             </div>
             <div className="text-xs text-gray-500 p-3 pt-0">
               {formatTime(item.created_time)}
@@ -338,23 +337,13 @@ export const PageMain = (data) => {
               onChange={handleFileChange}
             />
           </div>
-          <div className="flex flex-wrap mt-3">
-            {imageUrls.map((url, index) => (
-              <img
-                key={index}
-                src={url}
-                alt="Link Image"
-                className="w-1/4 p-2"
-              />
-            ))}
-            {imageFiles.map((file, index) => (
-              <img
-                key={index}
-                src={file}
-                alt="File Image"
-                className="w-1/4 p-2"
-              />
-            ))}
+          <div className="flex flex-wrap items-center justify-center mt-3">
+            {imageUrls && (
+              <img src={imageUrls} alt="Link Image" className="w-1/2 p-2" />
+            )}
+            {imageFiles && (
+              <img src={imageFiles} alt="File Image" className="w-1/2 p-2" />
+            )}
           </div>
         </div>
       </Modal>
@@ -381,37 +370,7 @@ export const PageMain = (data) => {
             onChange={(e) => setMessage(e.target.value)}
             className="p-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500"
           />
-          <div className="flex justify-between mt-3">
-            <input
-              type="text"
-              placeholder="Dán link"
-              onBlur={handleLinkChange}
-              className="w-1/2 p-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500"
-            />
-            <input
-              type="file"
-              multiple
-              className="w-1/2 p-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500"
-              onChange={handleFileChange}
-            />
-          </div>
-          <div className="flex flex-wrap mt-3">
-            {imageUrls.map((url, index) => (
-              <img
-                key={index}
-                src={url}
-                alt="Link Image"
-                className="w-1/4 p-2"
-              />
-            ))}
-            {imageFiles.map((file, index) => (
-              <img
-                key={index}
-                src={file}
-                alt="File Image"
-                className="w-1/4 p-2"
-              />
-            ))}
+          <div className="flex flex-wrap items-center justify-center mt-3">
             {post?.full_picture && (
               <img
                 src={post?.full_picture}

@@ -29,11 +29,11 @@ export const getPostsInPage = async (pageId, accessToken) => {
 };
 
 // Đăng bài viết
-export const postStatus = async (pageId, accessToken, message) => {
+export const postStatus = async (pageId, accessToken, message, link) => {
   try {
     const response = await AxiosInstance().post(
       `/posts/post-posts/${pageId}/${accessToken}`,
-      { message }
+      { message, link }
     );
     // console.log("get post >>>>>>>>>>>>>>> Service GetPosts 8 ", response);
     return response;
@@ -127,4 +127,14 @@ export const deleteComment = async (commentId, accessToken) => {
     console.error(" >>>>>>>>> Error fetching posts: 11 s", error);
     throw error;
   }
+};
+
+// thêm vào cloundinary
+export const uploadImageStatus = async (form) => {
+  const response = await AxiosInstance("multipart/form-data").post(
+    "cloudinary/upload-cloudinary",
+    form
+  );
+  // console.log(">>>>>>>>>>>>>>>>>> 49 cloudinary cloudinary", response.url);
+  return response.url;
 };

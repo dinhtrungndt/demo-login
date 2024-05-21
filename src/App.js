@@ -5,6 +5,7 @@ import "./index.css";
 import "react-toastify/dist/ReactToastify.css";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { PostsPages } from "./components/home/posts";
+import { DetailPostsAccount } from "./components/home/user/detailPosts";
 
 function App() {
   return (
@@ -13,6 +14,10 @@ function App() {
         <Routes>
           <Route path="/" element={<LoginPage />} />
           <Route path="/posts/:id" element={<PostsPages />} />
+          <Route
+            path="/detail-account-posts/:id"
+            element={<DetailPostsAccount />}
+          />
         </Routes>
       </Router>
       <ToastContainer />

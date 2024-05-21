@@ -6,11 +6,12 @@ import "../style/login.css";
 import { PageMain } from "../../home/pages";
 import { toast } from "react-toastify";
 import { DetailInfor } from "../../home/user";
+import { PageUser } from "../../home/user/pageUser";
 
 export const LoginPage = () => {
   const [login, setLogin] = useState(false);
   const [data, setData] = useState({});
-  const [picture, setPicture] = useState("");
+  // const [picture, setPicture] = useState("");
 
   localStorage.setItem("id_user", JSON.stringify(data.id));
   localStorage.setItem("token", JSON.stringify(data.accessToken));
@@ -20,17 +21,24 @@ export const LoginPage = () => {
       label: "Quản lý Page",
       children: <PageMain />,
       key: "1",
+      closable: false,
     },
     {
       label: "Trang cá nhân",
-      children: "Content of Tab 2",
+      children: <PageUser />,
       key: "2",
+      closable: false,
     },
     {
       label: "Thông tin cá nhân",
       children: <DetailInfor />,
       key: "3",
       closable: false,
+    },
+    {
+      label: "Thông tin bạn bè",
+      children: "Đang cập nhật...",
+      key: "4",
     },
   ];
 
@@ -44,8 +52,9 @@ export const LoginPage = () => {
     const newActiveKey = `newTab${newTabIndex.current++}`;
     const newPanes = [...items];
     newPanes.push({
-      label: "New Tab",
-      children: "Content of new Tab",
+      label: "Trang mới",
+      children:
+        "Trang mới này chỉ là trang rỗng. Nếu bạn muốn nâng cấp bạn vui lòng liên hệ với đội ngũ IT của chúng tôi.",
       key: newActiveKey,
     });
     setItems(newPanes);
@@ -81,7 +90,7 @@ export const LoginPage = () => {
   const responseFacebook = (response) => {
     // console.log(response);
     setData(response);
-    setPicture(response.picture.data.url);
+    // setPicture(response.picture.data.url);
     if (response.accessToken) {
       setLogin(true);
       toast.success("Đăng nhập thành công");
@@ -101,7 +110,8 @@ export const LoginPage = () => {
               </h4>
               <div>
                 <FacebookLogin
-                  appId="1253008412343322"
+                  // appId="1253008412343322"
+                  appId="473464405251591"
                   autoLoad={true}
                   fields="name,email,picture"
                   scope="public_profile,user_friends"

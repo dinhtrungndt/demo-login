@@ -6,7 +6,14 @@ export const DetailInfor = () => {
   const token = JSON.parse(localStorage.getItem("token"));
   const [accounts, setAccounts] = useState([]);
 
-  console.log("accounts", accounts);
+  // console.log("accounts", accounts);
+
+  const formatGender = () => {
+    if (accounts.gender === "male") {
+      return "Nam";
+    }
+    return "Nữ";
+  };
 
   const onGetAccounts = async (idUser, accessToken) => {
     try {
@@ -45,6 +52,16 @@ export const DetailInfor = () => {
           <p className="text-gray-700 flex justify-center">
             <span className="text-black font-semibold pr-1">Địa chỉ:</span>
             {accounts?.location?.name}
+          </p>
+          <p className="text-gray-700 flex justify-center">
+            <span className="text-black font-semibold pr-1">
+              Số điện thoại:
+            </span>
+            Vui lòng cập nhật
+          </p>
+          <p className="text-gray-700 flex justify-center">
+            <span className="text-black font-semibold pr-1">Giới tính:</span>
+            {formatGender()}
           </p>
         </div>
       </div>
