@@ -19,6 +19,7 @@ export const PostsPages = () => {
   const [comments, setComments] = useState([]);
   const [message, setMessage] = useState("");
   const [detailComment, setDetailComment] = useState([]);
+  const [parentCommentId, setParentCommentId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [putPostModal, setPutPostModal] = useState(false);
@@ -140,8 +141,20 @@ export const PostsPages = () => {
 
   const handlePostComment = async () => {
     try {
-      const response = await postComment(post.id, accessToken, message);
-      // console.log("response", response);
+      if (!message) {
+        return toast.error("Vui lòng nhập nội dung bình luận");
+      }
+
+      if (parentCommentId) {
+        const response = await replyComment(
+          parentCommentId,
+          accessToken,
+          message
+        );
+        setParentCommentId(null);
+      } else {
+        const response = await postComment(post.id, accessToken, message);
+      }
       setMessage("");
       onReloadComment();
       toast.success("Bình luận thành công");
@@ -155,17 +168,16 @@ export const PostsPages = () => {
     toast.error("Cảnh báo: Bạn đang muốn xóa bài viết này!");
   };
 
-  const handleCommentReplyParent = (item) => {
-    if (message.indexOf(`@${item.from.name}`) !== -1) {
-      return;
-    }
-
+  const handleCommentReplyParent = async (item) => {
     const name = `@${item.from.name} `;
     setMessage((prevMessage) => prevMessage + name);
+    setParentCommentId(item.id);
   };
 
   const handleCommentReplyParentC = (item) => {
-    console.log("comment reply parentC", item);
+    const name = `@${item.from.name} `;
+    setMessage((prevMessage) => prevMessage + name);
+    setParentCommentId(item.id);
   };
 
   const highlightMessageTags = (message, tags) => {

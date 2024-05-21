@@ -110,11 +110,11 @@ export const LoginPage = () => {
               </h4>
               <div>
                 <FacebookLogin
-                  // appId="1253008412343322"
-                  appId="473464405251591"
-                  autoLoad={true}
+                  appId="1253008412343322"
+                  // appId="473464405251591"
+                  autoLoad={false}
                   fields="name,email,picture"
-                  scope="public_profile,user_friends"
+                  scope="email,user_photos,user_posts,user_birthday,user_hometown,user_location,user_likes,user_events,user_videos,user_friends,user_gender,user_link,user_age_range,manage_fundraisers,public_profile"
                   callback={responseFacebook}
                   icon="fa-facebook"
                   textButton="Đăng nhập bằng facebook"
