@@ -20,7 +20,7 @@ export const getPostsAccounts = async (idUser, accessToken) => {
       `/accounts/get-posts-all/${idUser}/${accessToken}`
     );
     // console.log("get post >>>>>>>>>>>>>>> Service GetPosts 8 ", response);
-    return response.data;
+    return response;
   } catch (error) {
     console.error(" >>>>>>>>> Error fetching posts: 11 s", error);
     throw error;

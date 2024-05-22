@@ -15,6 +15,9 @@ export const PageUser = () => {
   const token = JSON.parse(localStorage.getItem("token"));
   const navigate = useNavigate();
 
+  const [nextUrl, setNextUrl] = useState(null);
+  // const [previousUrl, setPreviousUrl] = useState(null);
+
   //   console.log("accountsaccountsaccounts", accounts);
 
   const formatPrivacy = (item) => {
@@ -29,11 +32,18 @@ export const PageUser = () => {
     }
   };
 
-  const onGetPostsAccounts = async (idUser, accessToken) => {
+  const onGetPostsAccounts = async (idUser, accessToken, url = null) => {
     try {
-      const response = await getPostsAccounts(idUser, accessToken);
-      setPostsAccounts(response);
-      return response;
+      setLoading(true);
+      const response = url
+        ? await fetch(url).then((res) => res.json())
+        : await getPostsAccounts(idUser, accessToken);
+      setPostsAccounts((prevPosts) =>
+        url ? [...prevPosts, ...response.data] : response.data
+      ); // Append new posts if url, else replace
+      setNextUrl(response.paging?.next || null);
+      setLoading(false);
+      // setPreviousUrl(response.paging?.previous || null);
     } catch (error) {
       console.error(" >>>>>>>>> Error fetching posts: 11 s", error);
       throw error;
@@ -157,6 +167,24 @@ export const PageUser = () => {
             </div>
           </div>
         ))}
+      </div>
+      <div className="flex justify-center items-center w-full max-w-md mt-4">
+        {/* {previousUrl && (
+          <Button
+            onClick={() => onGetPostsAccounts(id_user, token, previousUrl)}
+            loading={loading}
+          >
+            Quay lại
+          </Button>
+        )} */}
+        {nextUrl && (
+          <Button
+            onClick={() => onGetPostsAccounts(id_user, token, nextUrl)}
+            loading={loading}
+          >
+            {loading ? "Đang tải..." : "Xem thêm"}
+          </Button>
+        )}
       </div>
       <Modal
         title={
