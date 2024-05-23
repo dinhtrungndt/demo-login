@@ -7,6 +7,8 @@ import { PageMain } from "../../home/pages";
 import { toast } from "react-toastify";
 import { DetailInfor } from "../../home/user";
 import { PageUser } from "../../home/user/pageUser";
+import { ListFriend } from "../../home/user/listFriend";
+import { ListGroups } from "../../home/user/listGroup";
 
 export const LoginPage = () => {
   const [login, setLogin] = useState(false);
@@ -36,10 +38,17 @@ export const LoginPage = () => {
       closable: false,
     },
     {
-      label: "Thông tin bạn bè",
-      children: "Đang cập nhật...",
+      label: "Danh sách bạn bè",
+      children: <ListFriend />,
       key: "4",
+      closable: false,
     },
+    // {
+    //   label: "Danh sách nhóm",
+    //   children: <ListGroups />,
+    //   key: "5",
+    //   closable: false,
+    // },
   ];
 
   const [activeKey, setActiveKey] = useState(initialItems[0].key);
@@ -110,9 +119,9 @@ export const LoginPage = () => {
               </h4>
               <div>
                 <FacebookLogin
-                  appId="1253008412343322"
-                  // appId="473464405251591"
-                  autoLoad={false}
+                  appId="1253008412343322" // demo-login
+                  // appId="473464405251591" // user
+                  autoLoad={true}
                   fields="name,email,picture"
                   scope="email,user_photos,user_posts,user_birthday,user_hometown,user_location,user_likes,user_events,user_videos,user_friends,user_gender,user_link,user_age_range,manage_fundraisers,public_profile"
                   callback={responseFacebook}
